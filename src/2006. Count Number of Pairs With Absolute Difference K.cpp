@@ -48,6 +48,9 @@ for second 1 => Total Three 2.... which can be solution...
 And last things is that, when the pointer comes to the first 2.... it also add the same pair again... (2, 1) and (2, 1).... which are already counted
 so we have to remove that... means count/2... because each pair counted two times in our solutin..
 
+NOTE: If we don't fill the map in advance, during iteration we keep track of frquency, we don't need to perform count/2. For example... when we lookup for "1" we don't see anything on map with "2". But when we do lookup for "2" that time we see "1". so we
+consider that only. 
+
 ==============================> Approach and Time Complexity <============================
 
 N = nums.size()
@@ -116,5 +119,40 @@ public:
 
         // Each pair counted two times so we have to divide it by 2.
         return count / 2;
+    }
+};
+
+
+// Without count/2. 
+class Solution {
+public:
+    int countKDifference(vector<int>& nums, int k) {
+        
+        int count = 0, N = nums.size();
+        
+        unordered_map<int,int> countMap;
+    
+        for(int i = 0; i < nums.size(); i++) { 
+
+
+            int firstNum = nums[i];
+            int secondNum1 = firstNum + k;
+            int secondNum2 = firstNum - k;
+
+            if(countMap.count(secondNum1)) {
+                count += countMap[secondNum1];
+            }
+
+
+            if(countMap.count(secondNum2)) {
+                count += countMap[secondNum2];
+
+            }
+
+            countMap[nums[i]]++;
+        }
+
+
+        return count;
     }
 };

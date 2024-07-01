@@ -52,17 +52,12 @@ so we need to add it again.
 N = s.size()
 
 1) Brute Force
-Time: O(N^2)
+Time: O(N*M*K), For k Query. 
 Space: O(1)
 
 2) prefixProduct && suffixProduct
-Time: O(N)
-Space: O(N)
-
-3) Dynamic prefixProduct & prefixProduct
-Time: O(N)
-Space: O(1)
-
+Time: O(N*M), Query: O(1)
+Space: O(N*M)
 
 */
 

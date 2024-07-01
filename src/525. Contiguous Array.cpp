@@ -34,6 +34,8 @@ Problems : https://leetcode.com/problems/contiguous-array/description/
 2) Prefix + Hashing:
 - Idea is that, we need to keep track of curSum.
 
+We subtract -1, when it is 0, Add 1, when it is 1. 
+
 AnyTime curSum got repeated, it means that we added something and subtracted same thing, that's why we again at same place. It is possible because we only have two state.
 
 NOTE: If it is more than three state, then it won't possible to use this apporach.

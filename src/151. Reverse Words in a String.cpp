@@ -101,12 +101,12 @@ public:
         }
 
         string ans = "";
-        for (int i = 0; i < words.size(); i++) {
-            if (i == words.size() - 1) {
+        for(int i = words.size() - 1; i >= 0; i--) {
+            if(i == 0) {
                 ans += words[i];
             }
             else {
-                ans += words[i] + "";
+                ans += words[i] + " ";
             }
         }
 
