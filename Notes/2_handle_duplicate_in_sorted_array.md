@@ -1,4 +1,3 @@
-
 ### Handle duplicate in sorted array Approach:
 
 We can use the extra O(N) space for map to store the last index of the element. 

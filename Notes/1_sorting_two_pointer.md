@@ -1,4 +1,3 @@
-
 ### What is this Sorting + Two Pointer Approach:
 
 Basically, this approach is used when you are given unsorted array(i, j) 
@@ -11,7 +10,7 @@ During each iteration, we reduce that (i, j) range either by removing a left or 
 if A[right] is not the best candidate for given matching criteria then A[right+1] is also not because A[right] < A[right+1].
 Same for A[left]. 
 
-This approach is not for finding the closest sum... It can be used anywhere in which we have to reduce the time complexity of O(N^2) to O(NLogN), and match
+This approach is not just for finding the closest sum... It can be used anywhere in which we have to reduce the time complexity of O(N^2) to O(NLogN), and match
 that condition to remove extreme(left, right) based on some condition. 
 
 Two Sum.
