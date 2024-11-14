@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define REP(i,n) for(int i = 0; i < n; i++)
+#define REP1(i,n) for(int i = 1; i <= n; i++)
+#define debug cout << "Ok" << endl;
+#define mod 1000000007
+#define eps 1e-6
+
+
+using namespace std;
+
+
+typedef pair<ll, ll> ii;
+typedef vector<ii> vii;
+typedef map<char, int> mci;
+typedef vector<int> vi;
+typedef vector<ll> vll;
+typedef vector<vi> vvi;
+typedef map<int, int> mii;
+
+
+/*
+==============================> Description <=============================================
+
+Question : 70. Climbing Stairs
+Topic : Backtracking
+Problems :https://leetcode.com/problems/climbing-stairs/description/
+==============================> Explanation <=============================================
+
+This time, we go from 0th_stair => Nth_stair. It is counter intuitive in descriptive manner. (Previously We went from Nth=>0th)
+
+Let me explain you from Nth=>0th approach,
+
+F(N) => F(N-1) + F(N-2)
+
+To reach Nth step we can go from N-1th step OR N-2th step. Both way we can reach Nth step.
+
+Asked, no of total ways so take total of it.
+
+==============================> Approach and Time Complexity <============================
+
+1) DP
+Time: O(2^N)(Recursion) => O(N)
+Space: O(N) => O(1)
+
+For Recursion,
+Formula => processing_time_for_each_node * (breadth^depth) => O(1) * O(2^N)
+Space => (maximum_depth)(stack space)
+
+ */
+
+
+
+// BU
+class Solution {
+
+public:
+
+    int memo[100];
+
+    int helper(int at, int N) {
+
+        // Went above Nth stair, not acceptable we return 0. (How many way to reach at Nth step, when you are N+1 step ? => 0)
+        if (at > N)
+            return 0;
+
+        // How many way to reach at Nth step, when you are Nth step ? => 1.
+        if (at == N)
+            return 1;
+
+        if (memo[at] != -1)
+            return memo[at];
+
+        // climbStairs(n) = climbStairs(n+1) + climbStairs(n+2)
+        // To reach Nth step we can either jump from (n-1)th step To Nth step or from (n-2)th step to N. (Yeah It looks counter intutitive in descriptive manner).
+        return memo[at] = helper(at + 1, N) + helper(at + 2, N);
+    }
+
+    int climbStairs(int n) {
+        memset(memo, -1, 100);
+        return helper(0, n);
+    }
+};
+
+
+// TD
+class Solution {
+
+public:
+
+    int climbStairs(int n) {
+
+        // Create dp table.
+        int dp[100] = {0};
+
+        // Base condition
+        dp[N] = 1;
+
+        for (int j = N - 1; j >= 0; j--)
+            dp[j] = dp[j + 1] + dp[j + 2];
+
+        return dp[0];
+    }
+};
+
+
+// TD-Space: We can use two states instead of entire array. (I didn't codede here!!)

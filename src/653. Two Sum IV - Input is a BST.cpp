@@ -1,0 +1,84 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define REP(i,n) for(int i = 0; i < n; i++)
+#define REP1(i,n) for(int i = 1; i <= n; i++)
+#define debug cout << "Ok" << endl;
+#define mod 1000000007
+#define eps 1e-6
+
+
+using namespace std;
+
+
+typedef pair<ll, ll> ii;
+typedef vector<ii> vii;
+typedef map<char, int> mci;
+typedef vector<int> vi;
+typedef vector<ll> vll;
+typedef vector<vi> vvi;
+typedef map<int, int> mii;
+
+
+/*
+==============================> Description <=============================================
+
+Question : 653. Two Sum IV - Input is a BST
+Topic : BST
+Problems : https://leetcode.com/problems/two-sum-iv-input-is-a-bst/
+
+==============================> Explanation <=============================================
+
+Again it is Two sum but in BST.
+
+We can use the same approach by traversing(with any method).
+
+1) We put in one sorted array and use two pointer approach. Time->O(N)(traverse) + O(N)(two pointer), Space:O(N)(to put in one array).
+
+2) HashMap Approach. (check the code). Time:O(N), Space:O(N)(for hashmap)
+
+3) We can traverse each node with val.. and then again do search in BST for (target-val) node...
+Time: O(N)(traverse each node) * O(H/N)(for search... search will take either O(H) in avg case, in worst case it will take O(N))
+
+==============================> Approach and Time Complexity <============================
+
+
+1) Binary Tree
+Time: O(N)
+Space: O(N)
+
+ */
+
+/* Intuition:
+
+Again it is Two sum but in BST.
+
+We can use the same approach by traversing(with any method).
+
+    1) We put in one sorted array and use two pointer approach. Time->O(N)(traverse) + O(N)(two pointer), Space:O(N)(to put in one array).
+
+    2) HashMap Approach. (check the code). Time:O(N), Space:O(N)(for hashmap)
+
+    3) We can traverse each node with val.. and then again do search in BST for (target-val) node...
+    Time: O(N)(traverse each node) * O(H/N)(for search... search will take either O(H) in avg case, in worst case it will take O(N))
+
+*/
+class Solution {
+public:
+    bool findTarget(TreeNode* root, int target) {
+        unordered_map<int, int> mp;
+        stack<TreeNode*> st;
+        while (root != nullptr || !st.empty()) {
+            while (root != nullptr) {
+                st.push(root);
+                root = root->left;
+            }
+            root = st.top(); st.pop();
+            if (mp.count(target - root->val)) {
+                return true;
+            }
+            mp[root->val] = 1;
+            root = root->right;
+        }
+        return false;
+    }
+};

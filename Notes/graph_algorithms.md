@@ -60,9 +60,21 @@ vector<int> breadthFirstSearch(vector<int> adj[], int V) {
 }
 ```
 
-### 3. Graph is bipartite using BFS [O(V+E), O(V)]
+### 3. Graph is bipartite using BFS + DFS [O(V+E), O(V)]
 
 ```c
+ /* Intuition
+
+
+Intuition behind the algorithm is that, 
+
+    If Graph contain the cycle, and that cycle is odd length, It means one of two adjancents node
+    have same color. It is not biparatite graph. 
+
+    If Graph contain no cycle, or have even length cycle, we are find, and grpah is biparatite. 
+
+
+ */
 vector<int> breadthFirstSearch(vector<int> adj[], int V) {
 
     // keep track of visited node, we don't visit the visited node again
@@ -99,6 +111,54 @@ vector<int> breadthFirstSearch(vector<int> adj[], int V) {
     }
     return true;
 }
+
+ // Using DFS
+
+bool bipartiteDfs(int node, vector<int> adjList, int color[]) {
+
+    if (color[node] == -1) color[node] = 1;
+
+    for (auto it : adjList[node]) {
+
+        // If adjacent Node is not colored yet.
+        if (color[it] == -1) {
+
+            // color with oppsite color of current node.
+            color[it] = 1 - color[node];
+
+            if (!bipartiteDfs(it, adjList, color))
+                return false;
+        }
+
+        // If it is already colored and color is same with current node. Means Grpah
+        // cannot be Bipartite.
+        else if (color[it] == color[node]) {
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+
+bool checkBipartite(vector<int> adjList[], int n) {
+
+    int color[n];
+
+    memset(color, -1, sizeof(color));
+
+    for (int i = 0; i < n; i++) {
+
+        if (color[i] == -1) {
+
+            if (!bipartiteDfs(i, adj, color))
+                return false;
+        }
+    }
+
+    return true;
+}
 ```
 
 ### 
@@ -106,6 +166,15 @@ vector<int> breadthFirstSearch(vector<int> adj[], int V) {
 ### 4. Cycle Detection on Undirected Graph Using BFS[O(V+E), O(V)]
 
 ```c
+ /* Intuition
+
+When we apply bfs/dfs on the graph, during traversal, if we visit neighbors node, and
+that is already visited by other node(except the parent), we found cycle.
+
+In undirected graph, we have both edges(forward, reversal), so we don't consider reverse edge which again point to parent,
+during travesal, so we keep track of parent, so we can ignore it during as potential neighbors.
+
+ */
 bool checkForCycle(int node, int V, vector<int> &visited, vector<int> adjList[]) {
 
     // Create queue for BFS. Here, <node, parent_node>
@@ -160,6 +229,16 @@ bool isCycle(int V, vector<int> adjList[]) {
 ### 5. Cycle Detection on Undirected Graph Using DFS[O(V+E), O(V)]
 
 ```c
+ /* Intuition
+
+When we apply bfs/dfs on the graph, during traversal, if we visit neighbors node, and
+that is already visited by other node(except the parent), we found cycle.
+
+In undirected graph, we have both edges(forward, reversal), so we don't consider reverse edge which again point to parent,
+during travesal, so we keep track of parent, so we can ignore it during as potential neighbors.
+
+ */
+
 bool checkForCycle(int node, int parent, vector<int> &vis, vector<int> adjList[]) {
 
     // Mark the current node as visited.
@@ -204,6 +283,41 @@ bool isCycle(int V, vector<int> adjList[]) {
 ### 6. Cycle Detection on Directed Graph Using DFS[O(V+E), O(V)]
 
 ```c
+ /* Intuition
+
+ What is major differnce between the DFS of Directed and Undirected Graph ?
+
+-> So In Un-Directed Graph there is no direction on edge so we consider it as bidirectional. But in the Directed graph,
+there is direction given (u, v) as edge, it means edge has direction from u -> v.
+
+Due to that, if one node is visited and again other node try to visit that node doesn't mean that there is cycle...
+Ex:
+
+1 -> 2 -> 3
+     |    |
+     4 -> 5
+
+2 -> 4 -> 5 -> 3(Visited) (DFS call 1)
+2 -> 3 (Already Visited) but it is not cycle. (DFS call 2)
+
+In directed Graph there is cycle if and only if current node is getting visited two times in same path. If the path is different
+then there is no cycle.
+
+Ex:
+
+1 -> 2 <- 3
+     |    |
+     4 -> 5
+
+Here you can see... 1->2->4->5->3->2(already visited)... in single path(single dfs call) we are getting the same node... it means there is cycle.
+
+
+Due to that,
+
+We need to keep one more array, pathVisited[] which tells us whether current node is repeated earlier in same path or not. And also
+whenever we backtrack that time we also backtrack from pathVisited.
+
+ */
 bool dfs(int node, vector<int> adjList[], vector<int> &visited, vector<int> &pathVisited) {
 
     // mark the current node as visited.
@@ -251,6 +365,22 @@ bool isCycle(vector<int> adjList[], int V) {
 ### 7. BFS on Maze(2D Matrix)(Dungeon Problem)[O(V^2), O(V^2)]
 
 ```c
+ /* Intuition
+
+ Intuition behind this algo is that,
+
+    We convert the given 2D Matrix(Maze) into the graph, so we can apply the BFS on that.
+
+    Based upon question, we define which node can be neighbors,
+
+        If we allow to move in 4 directions => we have 4 neighbors for any node maximum.
+
+        If we allow to move in 8 directions(diagonal as well) => we have 8 neighbors.
+
+    Simply, we will apply the BFS on maze(we don't convert it to graph), how(check on code).
+
+ */
+
 // We can also unwind the node from the queue based on level(the way we did in tree) whatever level we get when we
 // reach the exit point can be consider as shortest distance. Check the code..()
 bool ableToFindExit(int maze[][], int N, int start_x, int start_y) {
@@ -399,7 +529,14 @@ vector<int> topoSort(vector<int> adjList[], int V) {
 ### 10. Single Source Shortest Path for Undirected Graph(BFS+ Relextion) [O(V+E), O(V)]
 
 ```c
-void shortestPath(vector<int> adjList[], int V, int src) {
+ /*
+ Intuition:
+    We can get SSSP, by simply perforing BFS, starting from "src" node. As we know that, each edge cost 1 unit, BFS explore nodes which care close the node(compare to DFS),
+    so we can peform simple relexation,
+            dist[it] = 1 + dist[node], if we have edge "node -> it", where "node" is visited and "it" we are exploring..
+ */
+
+ void shortestPath(vector<int> adjList[], int V, int src) {
 
     // Initalize the distance array with maximum distance.
     vector<int> dist(V + 1, INT_MAX);
@@ -435,6 +572,30 @@ void shortestPath(vector<int> adjList[], int V, int src) {
 ### 11. SSSP for Directed Acyclic Graph [O(V+E), O(V)]
 
 ```c
+ /* Intuition:
+
+     If there is graphs looks like, Z -> A -> B -> C, and we need to find SSSP with src node "A".
+
+    So using topoOrder, we get the order in which we need to traverse the graph. Because it is
+    obvious that, all the nodes who are reachable from src node "A", have dependency as src
+    node "A", so in topoOrder src node "A" comes before these reachable nodes. and node Z is
+    unreachable from A, so Z comes before A in topoOrder.
+
+    Why It works ?
+    - Toposort visit all the node first, which does not have any dependency on it. So by doing that we find
+    all the nodes which can be reach from the source node. Because those node which are reachable from the source
+    node, have dependency as source node... so first source node unwind during topo order iteration... later we can use
+    the relaxation step to get shortest distnace.
+
+    And node which can not reach by the source node is popped from the stack first(visited first in topo order) and have distane as INT_MAX(never relaxation happen on that).
+
+    - And once any node distance is calculated(it is not INT_MAX) then we can use this node as intermidatory
+    for others once. The node which is not reached by the source node distance is INT_MAX so it can never
+    used as intermidatory node.
+
+
+
+ */
 vector<int> topologicalOrder(vector<pair<int, int>> adjList[], int V) {
 
     // calculate the inorder degree.
@@ -502,7 +663,38 @@ void shortestPath(vector<pair<int, int>> adjList[], int V, int src) {
 ### 12 .Dijkstra algorithm SSSP (non-negative-edge)[O(V+E)*logE, O(V)]
 
 ```c
-void shortestPath(vector<pair<int, int>> adjList[], int V, int src) {
+ /* Intuition:
+
+
+Similar to other SSSP Problem, We start visiting nodes from "src" node. To decide which node to visit next, we use the
+priority_queue which holds all promising nodes, and return the most optimistic node which have shortest distance till that time,
+so using that node we perform the relxation on its' neighbors nodes(it).
+
+Main idea is that,
+
+    IN Priority_queue we hold this pair => {dist, node}, dist => distToSource
+
+    PQ return a node, which have shortest distance from "src" node at any moment, so we visit that node first among
+    all potential nodes, which are in queue. Mark that node as visited.
+
+    So when we explore the neighbors nodes(it), with "node" as intermidatory node(which have shortest dist from src),
+
+        we check, distToSource[node] + edgeCost(node->it) < distToSource[node],
+
+                    if it is true, then we got better route to reach (it) node from (src) node via "node".
+
+                        update the distance of,
+
+                                distToSource[node] = distToSource[node] + edgeCost(node->it)
+
+Time: O((V+E)logE) => In the worst case, we visit entire graph during relexation O(V+E), and pq holds all the edges(considering duplicates as well), so pq.top() take O(E) time)
+
+
+
+
+ */
+
+ void shortestPath(vector<pair<int, int>> adjList[], int V, int src) {
 
     // keep track of shortest distance from src node.
     vector<int> distToSource(V + 1, INT_MAX);
@@ -571,7 +763,13 @@ void shortestPath(vector<pair<int, int>> adjList[], int V, int src) {
 ### 13 MST - Prim [O(V+E)*logE, O(V)]
 
 ```c
-int mstCost(vector<int> adjList[], int V) {
+/* Intuition:
+
+In simple words, we are selecting minimum edge(u->v) such that, u is already part of mst and v is not part of most. 
+
+*/
+
+ int mstCost(vector<int> adjList[], int V) {
 
     // check node is part of MST or not.
     vector<int> visited(V + 1, 0);
@@ -611,6 +809,40 @@ int mstCost(vector<int> adjList[], int V) {
 ### 14 Disjoint Set [O(4*alpha), O(V)]
 
 ```c
+ /* Intuition:
+
+ DisjointSet is Data Strcuture, which basically peroform this operation,
+    union(u, v) =>  make nodes u and v part of same set.
+    isPartofSameSet(u, v) => check both are part of same set or not.
+
+Path Compression(Optimization):
+    - So when we are finding the ultimate parent that time, it takes O(logN) time to get the parent. But,
+    using path compression each node in path points to ultimate parent directly.. so next time when we get parent of any node
+    from tha path.. we can get in O(1) time.
+
+Why connect to smaller set to larger one ? (Think without considering path compression)
+    - If we connect larger set to smaller set, in that case that findParent will take more
+    time, because larger tree already have greater height than smaller one... so it height won't be
+    increase...but if we add larger to smaller... we are increasing the height... which directly affect into time complexity.
+
+But we know optimization... so above one is not much create any impact.
+
+But wait if that's the case.. can we use the size of set instead of rank.
+
+We will add the smaller set(by size) to the larger set.
+
+---
+
+Most of time it take O(1) and but new path is explored first time that time it take O(logN).
+
+So amarotized tiem complexity is = O(4*alpha) = O(1) (constant) we can consider.
+
+Time = O(4*alpha) = O(4) = Constant (for any operation )
+Space = O(N)
+
+
+ */
+
 class DisjointSet {
 
     // Declare the required array as private
@@ -671,6 +903,15 @@ public:
 ### 15. MST - Kruskal Algorithm[O(E*logE), O(V)]
 
 ```c
+ /* Intuition:
+
+Intuition behind algorithm is that, 
+
+    We select all EDGEs from graph such that, we visit all the nodes of graph. 
+    But constraint is that, whenever we pick up any edge (u -> v), 
+    u and v are not part of same set(I mean, "u" is visited & "v" is not visited, or vice versa).
+
+ */
 int findMST(vector<vector<int>> adjList[], int V) {
 
     // convert the graph in {w, {u, v}} format.
@@ -719,6 +960,20 @@ int findMST(vector<vector<int>> adjList[], int V) {
 ### 16.  Kosaraju's Algorithm for Strongly Connected Components [O(N+E), O(N+E)]
 
 ```c
+
+/* Intuition
+
+The key idea is that the SCCs of the graph correspond to the SCCs of the graph's transpose.
+
+With main graph we have scc likes; SCC1 -> SCC2 -> SCC3
+With reverse graph we have scc likes: SCC1 <- SCC2 <- SCC3
+So when we perform the DFS on transpose graph and start to explore the SCC2 nodes... all nodes of SCC1 are
+visited because they are the first who popped out from the topo stack. So we can skip visited node(or we can say we can't update the low-link value(similar to tarjan algorithm))
+And to achieve this behaviour, we start with node which explored at last(indirectly used that topo stack)
+
+
+*/
+
 void dfs(int node, vector<int> adjList[], vector<int> &visited, stack<int> &st) {
     visited[node] = 1;
     for (auto it : adjList) {
@@ -779,6 +1034,27 @@ int getTotalSCC(vector<int> adjList[], int V) {
 ### 17. Tarjan's Algorithm for Strongly Connected Components[O(V+E), O(V)]
 
 ```c
+
+/* Intuition
+
+Tarjan's algorithm is a single-pass DFS-based algorithm that finds SCCs using a depth-first search tree.
+It uses a stack to keep track of the visited vertices and an array to record the low-link node
+reachable from each vertex.
+
+Graph is: 1 -> 2 -> 3 -> 1
+And when we are at 3 and again try to visit 1 which is already visited that time...3 can reach to 1 which is lowest_id for 3.
+It means 2 can also reach to 1. In short all are part of SCC.. because there is cycle and all can reach to each other through that cycle.
+
+
+And we already knew that for directed graph to get all nodes which are in same-path,
+we need stack & on_stack(array)(here) which keep track of which elements are on stack.
+
+
+Using these two, we make sure SCC2 does not use low link value of SCC1, because SCC1 are already visited,
+and not on stack.
+
+*/
+
 int sccCount = 0;   // Keep track of sccCount.
 
 void dfs(int node, int &runner, vector<int> adjList[], vector<int> &ids, vector<int> &low_link, stack<int> &st, vector<int> &onStack) {
@@ -843,6 +1119,18 @@ int getTotalSCC(vector<int> adjList[], int V) {
 ### 18.  Detecting Bridge in graph[O(V+E), O(V)]
 
 ```c
+
+/* Intuition
+
+Bridge Found: When the current "node", adjacent node(it) cannot reach to any ("current node or previous nodes of current "node") without
+using (node -> it) edge. Then if we break that edge... sub-graph got separated from the main graph.
+
+low_link[it] > ids[node] => Found bridge (node->it). 
+
+Note: Remember, "it" node is already visited. 
+
+*/
+
 void dfs(int node, int parent, int &timer, vector<int> adjList[], vector<int> &ids, vector<int> &low_link, int &countOfBridges) {
 
     // mark as visited and update all the ids and low_link.
@@ -903,6 +1191,20 @@ int getTotalNumberOfBridges(vector<int> adjList[], int V) {
 ### 19. Detecting Articulation point in graph[O(V+E), O(V)]
 
 ```c
+
+/* Intuition
+
+Articulation point Found: When the current "node", adjacent node(it) cannot reach to any ("previous nodes of current "node") without
+without going through "node". Then if we remove that node... sub-graph got separated from the main graph.
+
+low_link[it] >= ids[node] => Found Articulation point (node). 
+
+Edge case: parent node have more than one child, it is articulation point.
+
+Note: Remember, "it" node is already explored then we are checking this condition. 
+
+*/
+
 void dfs(int node, int parent, int &timer, vector<int> adjList[], vector<int> &ids, vector<int> &low_link, int &countOfArticulationPoint) {
 
     // mark as visited and update all the ids and low_link.
@@ -974,6 +1276,39 @@ int getTotalNumberOfArticulationPoint(vector<int> adjList[], int V) {
 ### ### 20. Bellman Ford Algorithm (SSSP with negative cycle)[O(E * (N-1)), O(V)]
 
 ```c
+/* Intuition
+
+Why Bellman Ford Algorithm For SSSP, When there is already Dijkstra ?
+- Dijkstras's Algorithm find SSSP correctly, if and only if there is no negative edge. There is chance that,
+with negative edge as well, dijkstra give correct answer but not 100%. Another concern is that, if in graph
+negative cycle is present then Dijkstrat won't work(each iteration we get the best node with negative dist).
+
+Due to that, Bellman Ford Algorithm is used,
+    - To get SSSP with negative edge
+    - Detect negative cycle (if present we won't get SSSP for all nodes)
+
+Intuition behind this algorithm is that,
+
+    If there are V vertices in the graph, then shorest path from "src" node to any other node have maximum "V-1" edges.
+
+    What we do is, we perform the edge relexations for all the edges, for V-1 times. Because in worst case, at each
+    iteration we get one edge relexed and propagate that changes to last node, require V-1 iterations.
+
+    After perform edge relexations V-1 times,
+
+        We peform one more time, to check any of node dist[] got changed.
+
+        If yes, then there is negative cycle present in graph.
+
+        If no, we get the SSSP.
+
+    If negative cycle present in graph,
+
+        And to get all nodes affected due to that cycle, we can again perform V-1 times edge relexations, so
+        changes of 1st edge relexations can reach to last node in worst case.
+
+
+*/
 vector<int> bellmanFordSSSP(vector<pair<int, int>> adjList[], int V, int src) {
 
     int inf = 1000000; // don't take INT_MAX due to addition operation
@@ -1030,6 +1365,45 @@ vector<int> bellmanFordSSSP(vector<pair<int, int>> adjList[], int V, int src) {
 ### 21. Floyd Warshall Algorithm (All pairs shortest path algorithm) [O(V^3), O(V^2)]
 
 ```c
+/* Intuition
+
+
+It use the "incremental path improvement".
+
+=> Basically, It tell us that try every vertex as intermidatory node and choose the best one.
+
+A1 -> A5 then I can try every vertex...
+A1 -> A2 + A2 -> A5
+A1 -> A3 + A3 -> A5
+A1 -> A4 + A4 -> A5
+
+Along with that,
+The algorithm builds up the solution iteratively, improving path estimates step
+by step by considering increasingly longer paths with more intermediate nodes.
+
+It begins with no intermediate nodes and only considers direct paths. 
+Then, it checks if adding one node as an intermediate node can improve 
+the shortest path between pairs, then two nodes, and so forth.
+
+iteration = 0 => direct edge (u -> v)
+iteration = 1 => dp[u][v] => minimum((u -> i) -> (i -> v))
+iteration = 2 => dp[u][v] => minimum((u->i->j) -> (j -> k -> v))
+    What I mean is that, for iteration=2, when we again put all node as intermidatory
+    node that time we are putting the chain of two nodes as intermidatory, because
+    we are using the result of previous iteration. 
+    Ex:
+    A1 -> A3 => A1 -> A2 + A2 -> A3 => min(A1->A0->A2 , A1->A5->A2)(A1->A2)(This is already calculated and one of the lowest stored in A1->A2 so we use that) + A2->A3
+  
+
+And to propogate the change to every other node we need to peform same thing N(total_vertex) times. (incremental path build up)
+
+A1 -> A2 -> A3 -> A4 -> A5... this is path.. okay during first iteration suppose A1 got updated with best value, which is
+also works for all other nodes who is depend on that.. to propagate A1 change to A5 we need to peform same thing
+5 times so each time one of the node got changes which can be propogate to next node during next iteration.
+
+
+*/
+
 vector<vector<int>> floydWarshallAlgo(vector<pair<int, int>> adjList[], int V) {
 
     // keep track of shortest distance from A->B
