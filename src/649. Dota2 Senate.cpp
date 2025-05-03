@@ -70,12 +70,12 @@ public:
             if (radiants.front() < dire.front()) {
                 radiants.pop();
                 dire.pop();
-                dire.push(N++);     // again add player from this team.
+                radiants.push(N++);
             }
             else {
                 radiants.pop();
                 dire.pop();
-                radiants.push(N++);
+                 dire.push(N++);     // again add player from this team.
             }
 
         }

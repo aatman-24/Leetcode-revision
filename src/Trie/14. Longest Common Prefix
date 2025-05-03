@@ -1,0 +1,103 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define REP(i,n) for(int i = 0; i < n; i++)
+#define REP1(i,n) for(int i = 1; i <= n; i++)
+#define debug cout << "Ok" << endl;
+#define mod 1000000007
+#define eps 1e-6
+
+using namespace std;
+
+typedef pair<ll, ll> ii;
+typedef vector<ii> vii;
+typedef map<char, int> mci;
+typedef vector<int> vi;
+typedef vector<ll> vll;
+typedef vector<vi> vvi;
+typedef map<int, int> mii;
+
+
+/*
+
+==============================> Description <=============================================
+
+Question : 14. Longest Common Prefix
+Topic : String, Trie, Prefix
+Problems : https://neetcode.io/problems/last-stone-weight
+
+==============================> Explanation <=============================================
+
+Brute Force:
+Idea is clear that, need to find the longest prefix among all given strs. And longest prefix
+we may have is string with minimum size. So we picked it up, and then get all prefix of
+string str, and compare with other words prefix...if every word has that prefix then it is
+one of prefix which is longest, but we keep trying until we fail bcz what we need is longest.
+
+Optimize:
+- Instead of sorting entire array we can still pick up min size string with comparing and
+tracking str, in O(N).
+
+Trie:
+It is not fitting well, into this problem, otherwise prefix and word mathching problem this
+is best solution. Here, as well we can apply.... how ? => once we have the minimum size string
+we can create the trie out of it... and later rest of word can try to match prefix of that word
+and smallest matching of prefix is our answer....
+
+
+==============================> Approach and Time Complexity <============================
+
+1) PQ
+Time: O(NLogN)
+Space: O(N)
+
+*/
+
+
+// Brute Force, Time = O(NlogN) + O(K*N), K = 200
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+
+        // edge cases.
+        if (strs.size() == 0) return "";
+        if (strs.size() == 1) return strs[0];
+
+        // sort strs based on their length      // O(NlogN)
+        sort(strs.begin(), strs.end(), [](const string & a, const string & b) {
+            return a.size() < b.size();
+        });
+
+        // pick the smallest string, (catch: we can get minimum size word in O(N) as well, no need to sort and pick it up)
+        string smallestStr = strs[0];
+
+        string longestPrefix = "";
+
+        for (int i = 1; i <= smallestStr.size(); i++) {   // O(K)
+
+            // for smallest string, we try to create prefix as (0, i)
+            string prefix = smallestStr.substr(0, i);
+
+            // we match with other string prefix of same size.
+            bool allMatch = true;
+
+            for (string w : strs) {                     // O(K*N)
+
+                if (w.substr(0, i) != prefix) {
+                    allMatch = false;
+                    break;
+                }
+
+            }
+
+            if (!allMatch) {
+                break;
+            }
+            else {
+                longestPrefix = prefix;
+            }
+
+        }
+
+        return longestPrefix;
+    }
+};
