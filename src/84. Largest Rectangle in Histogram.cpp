@@ -108,7 +108,10 @@ public:
     }
 };
 
-
+// This is a little bit different.
+// x1 < x2 < x3 > H[i]...then we are finding left boundary for H[i] by removing x1, x2, x3 from stack...
+// (all other apporach after this)
+// x1 < x2 < x3 > H[i]... then we are finding right boundary for x1, x2, and x3 is H[i].... (similar ot next greater or next less element).
 class Solution {
 public:
     int largestRectangleArea(vector<int>& arr) {
@@ -190,6 +193,63 @@ public:
             }
 
             st.push(i);
+        }
+
+        return largest;
+    }
+};
+
+// Align with above solution
+class Solution {
+public:
+
+    int largestRectangleArea(vector<int>& heights) {
+
+        int N = heights.size();
+
+        // keep track of right boundary
+        vector<int> rightBoundary(N, 0);
+
+        stack<int> st;
+
+        for (int i = 0; i <= N; i++) {
+
+            // Here, height[i] is right boundary for kth position, k < i
+            while (!st.empty() && (i == N || heights[st.top()] > heights[i])) {
+                rightBoundary[st.top()] = i;
+                st.pop();
+            }
+
+            st.push(i);
+        }
+
+        // clear the stack, so we can use it
+        while (!st.empty()) st.pop();
+
+
+        // keep track of left boundary
+        vector<int> leftBoundary(N, 0);
+
+        for (int i = N - 1; i >= -1; i--) {
+
+            // Here, height[i] is left boundary for kth position, i < k
+            while (!st.empty() && (i == -1 || heights[st.top()] > heights[i])) {
+                leftBoundary[st.top()] = i;
+                st.pop();
+            }
+
+            st.push(i);
+        }
+
+
+        // finding maximum reactangle
+        int largest = 0;
+        for (int i = 0; i < N; i++) {
+
+            int height = heights[i];
+            int width = (i - leftBoundary[i]) + (rightBoundary[i] - i) - 1;
+
+            largest = max(largest, height * width);
         }
 
         return largest;
